@@ -8,30 +8,22 @@ import { IPaginacao } from "../../interfaces/IPaginacao";
 const ListaRestaurantes = () => {
   const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([]);
   const [proximaPagina, setProximaPagina] = useState("");
+  const [paginaAnterior, setPaginaAnterior] = useState("");
 
-  useEffect(() => {
-    axios
-      .get<IPaginacao<IRestaurante>>(
-        "http://localhost:8000/api/v1/restaurantes/",
-      )
-      .then(resposta => {
-        setRestaurantes(resposta.data.results);
-        setProximaPagina(resposta.data.next);
-      });
-    // .catch(erro => {
-    //   console.log(erro)
-    // })
-  }, []);
-
-  const verMais = () => {
-    axios.get<IPaginacao<IRestaurante>>(proximaPagina).then(resposta => {
-      setRestaurantes([...restaurantes, ...resposta.data.results]);
+  const carregarDados = (url: string) => {
+    axios.get<IPaginacao<IRestaurante>>(url).then(resposta => {
+      setRestaurantes(resposta.data.results);
       setProximaPagina(resposta.data.next);
+      setPaginaAnterior(resposta.data.previous);
     });
     // .catch(erro => {
     //   console.log(erro)
     // })
   };
+
+  useEffect(() => {
+    carregarDados("http://localhost:8000/api/v1/restaurantes/");
+  }, []);
 
   return (
     <section className={style.ListaRestaurantes}>
@@ -41,7 +33,24 @@ const ListaRestaurantes = () => {
       {restaurantes?.map(item => (
         <Restaurante restaurante={item} key={item.id} />
       ))}
-      {proximaPagina && <button onClick={verMais}>Ver mais</button>}
+      <div className={style.Button}>
+        {
+          <button
+            className={style.ButtonMenos}
+            onClick={() => carregarDados(paginaAnterior)}
+            children="<"
+            disabled={!paginaAnterior}
+          />
+        }
+        {
+          <button
+            className={style.ButtonMais}
+            onClick={() => carregarDados(proximaPagina)}
+            children=">"
+            disabled={!proximaPagina}
+          />
+        }
+      </div>
     </section>
   );
 };
