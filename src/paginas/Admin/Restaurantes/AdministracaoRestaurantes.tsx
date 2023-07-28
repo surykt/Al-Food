@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import IRestaurante from "../../../interfaces/IRestaurante";
 import {
+  Button,
   Paper,
   Table,
   TableBody,
