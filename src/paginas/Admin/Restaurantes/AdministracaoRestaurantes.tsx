@@ -21,6 +21,19 @@ export default function AdministraçãoRestaurantes() {
       .then(resposta => setRestaurantes(resposta.data));
   }, []);
 
+  function excluir(restauranteExcluido: IRestaurante) {
+    axios
+      .delete<IRestaurante>(
+        `http://localhost:8000/api/v2/restaurantes/${restauranteExcluido.id}/`,
+      )
+      .then(() => {
+        const listaRestaurantes = restaurantes.filter(
+          restaurante => restaurante.id !== restauranteExcluido.id,
+        );
+        setRestaurantes([...listaRestaurantes]);
+      });
+  }
+
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -28,11 +41,12 @@ export default function AdministraçãoRestaurantes() {
           <TableRow>
             <TableCell>Nome</TableCell>
             <TableCell>Editar</TableCell>
+            <TableCell>Excluir</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {restaurantes.map(restaurante => (
-            <TableRow>
+            <TableRow key={restaurante.id}>
               <TableCell>{restaurante.nome}</TableCell>
               <TableCell>
                 [
@@ -41,6 +55,15 @@ export default function AdministraçãoRestaurantes() {
                   children="editar"
                 />
                 ]
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => excluir(restaurante)}
+                >
+                  Excluir
+                </Button>
               </TableCell>
             </TableRow>
           ))}
