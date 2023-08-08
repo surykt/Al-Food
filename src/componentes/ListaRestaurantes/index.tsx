@@ -10,6 +10,7 @@ const ListaRestaurantes = () => {
   const [proximaPagina, setProximaPagina] = useState("");
   const [paginaAnterior, setPaginaAnterior] = useState("");
   const [busca, setBusca] = useState("");
+  const [ordenacao, setOrdenacao] = useState("");
 
   interface IParametrosBusca {
     ordering?: string;
@@ -35,12 +36,21 @@ const ListaRestaurantes = () => {
     if (busca) {
       opcoes.params.search = busca;
     }
+    if (ordenacao) {
+      opcoes.params.ordering = ordenacao;
+    }
     carregarDados("http://localhost:8000/api/v1/restaurantes/", opcoes);
   }
 
   useEffect(() => {
     carregarDados("http://localhost:8000/api/v1/restaurantes/");
   }, []);
+
+  const selectOptions = [
+    { label: "Padrão", value: "" },
+    { label: "Por ID", value: "id" },
+    { label: "Por Nome", value: "nome" },
+  ];
 
   return (
     <section className={style.ListaRestaurantes}>
@@ -53,7 +63,22 @@ const ListaRestaurantes = () => {
           value={busca}
           onChange={evento => setBusca(evento.target.value)}
         />
-        <button type="submit">buscar</button>
+        <div>
+          <label htmlFor="select-ordenação">Ordenação</label>
+          <select
+            name="select-ordenação"
+            id="select-ordenação"
+            value={ordenacao}
+            onChange={evento => setOrdenacao(evento.target.value)}
+          >
+            {selectOptions.map(option => (
+              <option value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <button type="submit">buscar</button>
+        </div>
       </form>
       {restaurantes?.map(item => (
         <Restaurante restaurante={item} key={item.id} />
